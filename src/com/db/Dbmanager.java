@@ -15,11 +15,11 @@ public class Dbmanager {
 	// 驱动程序名
     private final String driver = "com.mysql.jdbc.Driver";
     // URL指向要访问的数据库名yuqing
-    private final String url = "jdbc:mysql://localhost:3306/yuqing?useUnicode=true&characterEncoding=GBK";
+    private final String url = "jdbc:mysql://115.28.26.111:3306/yuqing?useUnicode=true&characterEncoding=GBK";
     // MySQL配置时的用户名
     private final String user = "root";
     // MySQL配置时的密码
-    private final String password = "";
+    private final String password = "sqlroot1993";
     //连接数据库
     private Connection conn = null;
     private Statement st = null;
@@ -70,6 +70,7 @@ public class Dbmanager {
 			}
 		} catch (SQLException e) {
 			System.out.println("查询数据库数据时发生错误!");
+			System.out.println(e.getMessage());
 		}finally{
 			closeConn(conn, st, rs);
 		}

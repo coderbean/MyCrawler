@@ -127,11 +127,11 @@ public class InitTagUrl {
      * 并删除下载文件中相应的视频
      */
     public void initVideoInfDownFlag(){
-		String sqlText_CheckDownFlag = "SELECT vDownID,vPath FROM videodownloadinf,videoinf WHERE videodownloadinf.vUrl=videoinf.vUrl AND vDownFlag=1;";
+		String sqlText_CheckDownFlag = "SELECT vDownID,vPath FROM videoDownloadInf,videoInf WHERE videoDownloadInf.vUrl=videoInf.vUrl AND vDownFlag=1;";
 		ArrayList CheckDownFlagSet = new ArrayList();
 		CheckDownFlagSet = dbmanager.executeQuery(sqlText_CheckDownFlag);
 		String sqlText_updateVideoInfDownload = "";
-		String sqlText_updateVideoInf = "UPDATE videoinf SET vDownFlag=0 WHERE vDownFlag=1;";
+		String sqlText_updateVideoInf = "UPDATE videoInf SET vDownFlag=0 WHERE vDownFlag=1;";
 		
 		for(int i=0;i < CheckDownFlagSet.size();i++){
 			
@@ -145,7 +145,7 @@ public class InitTagUrl {
 			}else {
 				System.out.println("File can't find!");
 			}
-			sqlText_updateVideoInfDownload = "DELETE from videodownloadinf where vDownID = "+ vDownID +";";
+			sqlText_updateVideoInfDownload = "DELETE from videoDownloadInf where vDownID = "+ vDownID +";";
 			dbmanager.executeUpdate(sqlText_updateVideoInfDownload);
 		}
 		dbmanager.executeUpdate(sqlText_updateVideoInf);

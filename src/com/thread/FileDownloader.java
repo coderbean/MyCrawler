@@ -87,7 +87,7 @@ public class FileDownloader extends Thread {
 			// 读取网络文件,写入指定的文件中
 			System.out.println("reading file now...");
 			//debug--开始下载标记
-			String sqlText = "UPDATE videoinf set vDownFlag = 1 where vUrl='"+ m_videoUrl.toString()+"'";
+			String sqlText = "UPDATE videoInf set vDownFlag = 1 where vUrl='"+ m_videoUrl.toString()+"'";
 			dbmanager.executeUpdate(sqlText);
 			
 			InputStream istream = httpConnection.getInputStream();
@@ -119,7 +119,7 @@ public class FileDownloader extends Thread {
 		m_thrd_msg.decThread();
 		
 		//debug
-		String sqlText = "UPDATE videoinf set vDownFlag = "+flag+" where vUrl='"+ m_videoUrl.toString()+"'";
+		String sqlText = "UPDATE videoInf set vDownFlag = "+flag+" where vUrl='"+ m_videoUrl.toString()+"'";
 		dbmanager.executeUpdate(sqlText);
 		System.out.println("更新下载视频标记：" + sqlText);
 		//debug

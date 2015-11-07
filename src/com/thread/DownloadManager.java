@@ -265,7 +265,7 @@ public class DownloadManager extends Thread {
 	//获取下载地址
 	public Vector<URL> convert_videoUrl_to_downloadUrl(URL url)
 	{
-		String videoUrlString = "http://www.flvcd.com/parse.php?kw=" + url.toString();
+		String videoUrlString = "http://www.flvcd.com/parse.php?kw=" + url.toString() + "&go=1";
 		String regex = "";
 		if(videoUrlString.contains("youku"))
 			regex = "<a href=\"(http://\\S*/flv/\\S*)\"";

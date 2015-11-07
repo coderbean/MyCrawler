@@ -127,9 +127,9 @@ public class MyCrawler extends Thread {
 			//初始化被中断的文件
 			m_init_Tag = new InitTagUrl();
 			m_init_Tag.initVideoInfDownFlag();
-//			m_init_Tag.initTagWithSeeds();
-//			String sqlText = "select seedsUrl from seeds where seedsFlag = false";
-//			myCrawler.initCrawlerWithSeeds(sqlText);
+			m_init_Tag.initTagWithSeeds();
+			String sqlText = "select seedsUrl from seeds where seedsFlag = false";
+			myCrawler.initCrawlerWithSeeds(sqlText);
 			myCrawler.PushPageQueue(new URL("http://news.youku.com/"));
 			myCrawler.PushPageQueue(new URL("http://news.sina.com.cn/bn/shyfz/"));
 			myCrawler.PushPageQueue(new URL("http://v.163.com/zixun/V7M3CBCH5/1/rank_1.html"));

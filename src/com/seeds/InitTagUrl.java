@@ -1,6 +1,8 @@
 package com.seeds;
 
-
+/**
+ * 2015年11月7日,修改获取标签的正则表达式
+ */
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -63,7 +65,7 @@ public class InitTagUrl {
 	public void initTagWithSeeds()
 	{
 		fileName = System.getProperty("user.dir") + System.getProperty("file.separator")
-			+"src/src/seeds/seeds.txt";
+			+"src/com/seeds/seeds.txt";
 		File file = new File(fileName);
         BufferedReader reader = null;
         try {
@@ -78,16 +80,17 @@ public class InitTagUrl {
                 // debug
                 System.out.println(tempString);
                 if(tempString.contains("youku"))
+					// 标签的获取正则已经过时,更新日期2015年11月7日By张博
                 	initSeedsUrl(new URL(tempString),
-                			"<div class=\"subNav\">.*?<div class=\"items\">(.*?)</div>\\s*</div>",
+							"<div class=\"yk-nav\"><div class=\"yk-box\"><div class=\"yk-nav-second\">",
                 			"<li .*?><a .*?href=\"(.*?)\"\\s*.*?>(.*?)</a></li>","UTF-8");
                 else if(tempString.contains("ku6"))
                 	initSeedsUrl(new URL(tempString), 
-                			"<div class=\"subNav area cfix\">.*?<ul>(.*?)</ul>.*?</div>", 
-                			"<li><a .*?href=\"(.*?)\"\\s*.*?>(.*?)</a>.*?</li>","GBK");
+                			"<div class=\"yl-tl.*?clear-float",
+                			"<div class=\"yl-tl.*?clear-float\"><span><SPAN>(.*?)</span> </SPAN>","GBK");
                 else if(tempString.contains("cntv"))
-                	initSeedsUrl(new URL(tempString), "<ul class=\"tree\">(.*?)</ul>", 
-                			"<li><a href=\"(.*?)\"\\s*.*?>(.*?)</a></li>", "UTF-8");
+                	initSeedsUrl(new URL(tempString), "<ul class=\"dropdown\">([\\s\\S]*?)</ul>",
+                			"<li ><a href=\"/video/index-hot-\\d.html\">.*?</a></li>", "UTF-8");
             }
             
         } catch (IOException e) {

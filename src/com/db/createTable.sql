@@ -37,5 +37,6 @@ CREATE TABLE videoDownloadInf
 CREATE TABLE seeds
   (
      seedsUrl VARCHAR(100) NOT NULL PRIMARY KEY,
-     seedsStr VARCHAR(50) NOT NULL
+     seedsStr VARCHAR(50) NOT NULL,
+     seedsFlag tinyint(1) NULL
   );

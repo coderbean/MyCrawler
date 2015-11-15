@@ -122,9 +122,6 @@ public class SiteSolver {
         HttpURLConnection con = null;
 		try {
 			con = (HttpURLConnection)url.openConnection();
-			con.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");//IE代理进行下载
-			con.setConnectTimeout(60000);
-			con.setReadTimeout(60000); 
 			
 			//获得网页返回信息码
 			
@@ -145,6 +142,14 @@ public class SiteSolver {
 					con.disconnect();
 					return null;
 				}
+
+//			//打开连接，发送请求
+//			BufferedReader reader=new BufferedReader(new InputStreamReader(con.getInputStream()));
+//			String line="";
+//			while((line=reader.readLine())!=null){
+////				System.out.println(line);
+//				contentBuffer.append(line);
+//			}
 
             InputStream inStr = con.getInputStream();
 			InputStreamReader istreamReader = new InputStreamReader(inStr);

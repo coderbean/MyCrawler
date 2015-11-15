@@ -40,3 +40,13 @@ CREATE TABLE seeds
      seedsStr VARCHAR(50) NOT NULL,
      seedsFlag tinyint(1) NULL
   );
+
+
+CREATE TABLE errorUrl
+  (
+    vUrl         VARCHAR(200) NOT NULL PRIMARY KEY,
+    responseCode INT,
+    exception    VARCHAR(100),
+    ex_datetime  DATE
+
+  );

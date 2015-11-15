@@ -38,7 +38,7 @@ public class InitTagUrl {
 	    if(!matcher.find())
 	    	 return;
 	     
-	    String containStr =  matcher.group(1);
+	    String containStr =  matcher.group(0);
 	    Pattern pattern2 = Pattern.compile(regex2);
 	    Matcher matcher2 = pattern2.matcher(containStr);
 	    while(matcher2.find())

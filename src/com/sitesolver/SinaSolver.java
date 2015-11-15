@@ -108,7 +108,7 @@ public class SinaSolver extends SiteSolver {
 		HashMap videoInfSet = new HashMap();
 		if(list.size() != 1)
 		{
-			//将信息插入数据库videoInf表
+			//将信息插入数据库videoInf表:所以说这里除了问题,需要修改getVideoInf函数
 			sqlText = getVideoInf(fileUrl,contentBuffer);
 			if(sqlText != ""){
 				//该视频地址插入m_file_que
@@ -279,7 +279,7 @@ public class SinaSolver extends SiteSolver {
 		//上传日期
 		vDatatime = getVideoDate(contentBuffer, "</a>&nbsp;&nbsp;(.*?)&nbsp");
 		//标签
-		vTag = getVideoTag(contentBuffer, "<ul class=\"tagTxt\" id=\"videoTag\">(.*?)</ul>");
+		vTag = getVideoTag(contentBuffer, "<p class=\"tags\">(.*?)<p>");
 		if(vTag.equals("") || vTitle.equals(""))
 			return sqlText;
 		
@@ -309,7 +309,7 @@ public class SinaSolver extends SiteSolver {
 		return userName;
 	}
 	
-	//获得视频标签
+	//获得视频标签: 张博更新 已经无法获取新浪的tag
 	public String getVideoTag(StringBuffer contentString,String regex)
 	{
 		String temp = "";

@@ -1,0 +1,9 @@
+<<<<<<< Updated upstream
+http://news.youku.com
+http://news.ku6.com
+http://xiyou.cntv.cn/video/index-hot-2.html
+=======
+http://news.youku.com
+http://news.ku6.com
+http://xiyou.cntv.cn/video/index-hot-2.html
+>>>>>>> Stashed changes

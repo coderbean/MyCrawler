@@ -121,7 +121,7 @@ public class MyCrawler extends Thread {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
+
 		try {
 			MyCrawler myCrawler = new MyCrawler();
 			//初始化被中断的文件

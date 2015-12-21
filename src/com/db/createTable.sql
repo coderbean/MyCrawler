@@ -24,15 +24,15 @@ CREATE TABLE videoInf
      vHot                  INT
   );
 
-CREATE TABLE videoDownloadInf
-  (
-     vUrl        VARCHAR(200) NOT NULL PRIMARY KEY,
-     vDownId     INT,
-     vPath       VARCHAR(100),
-     vFileSize   BIGINT,
-     vSequence   INT,
-     vProcessing INT
-  );
+CREATE TABLE `videoDownloadInf` (
+  `vUrl` varchar(200) NOT NULL,
+  `vDownId` int(11) NOT NULL AUTO_INCREMENT,
+  `vPath` varchar(1000) DEFAULT NULL,
+  `vFileSize` bigint(20) DEFAULT NULL,
+  `vSequence` int(11) DEFAULT NULL,
+  `vProcessing` int(11) DEFAULT NULL,
+  PRIMARY KEY (`vDownId`,`vUrl`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 
 CREATE TABLE seeds
   (

@@ -195,7 +195,7 @@ public class Ku6Solver extends SiteSolver {
 		//返回真
 		return true;
 	}
-	
+	//修改了获取的标签
 	public String getVideoTag(StringBuffer contentString,String regex1,String regex2)
 	{
 		String tag = ""; 
@@ -204,28 +204,32 @@ public class Ku6Solver extends SiteSolver {
 		Pattern pattern = Pattern.compile(regex2,Pattern.CANON_EQ);
 		Matcher matcher = pattern.matcher(div);
 		while(matcher.find())
-		{ 	if(count == 3)
-				tag = matcher.group(1).toString().trim();
-			count++;
-		}
-		
-		List<String> list = new ArrayList<String>();  
-		pattern = Pattern.compile("<a href=.*?>(.*?)</a>",Pattern.CANON_EQ);
-		matcher = pattern.matcher(tag);
-		while(matcher.find())
 		{
-			list.add(matcher.group());
+			if(count == 0) {
+				tag += matcher.group(1).toString().trim();
+				count++;
+				continue;
+			}
+			tag += "#"+matcher.group(1).toString().trim();
 		}
-		
-		tag = "";
-		
-		if(list.size() == 0)
-			return tag;
-		
-		for(int i=0;i<list.size();i++)
-			tag += list.get(i).replaceAll("<.*?>", "").replaceAll("\\pP", "")+"#";
-		
-		return tag.replaceAll("[a-z]|[A-Z]|[0-9]|[：]|[~]|[～]", "");
+		return tag;
+//		List<String> list = new ArrayList<String>();
+//		pattern = Pattern.compile("<a href=.*?>(.*?)</a>",Pattern.CANON_EQ);
+//		matcher = pattern.matcher(tag);
+//		while(matcher.find())
+//		{
+//			list.add(matcher.group());
+//		}
+//
+//		tag = "";
+//
+//		if(list.size() == 0)
+//			return tag;
+//
+//		for(int i=0;i<list.size();i++)
+//			tag += list.get(i).replaceAll("<.*?>", "").replaceAll("\\pP", "")+"#";
+//
+//		return tag.replaceAll("[a-z]|[A-Z]|[0-9]|[：]|[~]|[～]", "");
 	}
 	
 	//获得视频上传日期
@@ -368,13 +372,13 @@ public class Ku6Solver extends SiteSolver {
 		
 		//上传日期
 		vDatatime = getVideoDate(contentBuffer, "<div class=\"infoBox cfix\">(.*?)</div>","<em>(.*?)</em>");
-		//标签
-		vTag = getVideoTag(contentBuffer, "<div class=\"infoBox cfix\">(.*?)</div>","<dd>(.*?)</dd>");
+		//标签,修改了获取标签的正则表达式,
+		vTag = getVideoTag(contentBuffer, "<span class=\"ckl_title\">(.*?)</span>","<a href=\".*?\" target=\"_blank\">(.*?)</a>");
 		if(vTag.equals("") || vTitle.equals(""))
 			return sqlText;
 		vCommentContent = getCommentContent(videoUrl, "<p>(.*?)</p>","",-1);
-		//上传用户
-		vUploadUserName = getUploadUsers(contentBuffer, "<a.*?class=\"author\">(.*?)</a>");
+		//上传用户,修改了正则表达式获取上传用户
+		vUploadUserName = getUploadUsers(contentBuffer, "<span class=\"ckl_tet\">上 传 者：<a href=\".*?\" title=\".*?\" target=\"_blank\" data-uid=\".*?\">(.*?)</a> </span>");
 		sqlText = "insert into videoInf(vUrl,vTitle,vTitleResult,vTag,vTagResult,vCommentContent,vCommentContentResult,vDatatime,vUploadUser,vDownFlag,vComeFrom,vClass,vHot) values('" 
 			+ videoUrl + "','" + vTitle + "','','" + vTag + "','','" + vCommentContent 
 			+"','','"+ vDatatime +"','"+ vUploadUserName +"',0,'酷6','',0)";

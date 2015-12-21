@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.db.Dbmanager;
+import com.sun.javafx.scene.layout.region.Margins;
 import com.thread.URLQueue;
 
 
@@ -78,21 +79,33 @@ public class CntvSolver extends SiteSolver {
 			m_page_que.put(videoUrls.get(i));
 			
 		//debug
-		System.out.println("YouKuSolver end work, with input URL a page URL.");
+		System.out.println("CntvSolver end work, with input URL a page URL.");
 		System.out.println("two storages' sizes are " + m_page_que.size() + " and " + m_file_que.size());
 	}
 	
 	
 	public boolean analyzeFileUrl(URL fileUrl)
 	{
-		
+
+
+//		//debug
+//		try {
+//			fileUrl = new URL("http://xiyou.cntv.cn/v-0adae89a-30d6-11df-be82-001e0bbb2454.html");
+//		} catch (MalformedURLException e) {
+//			e.printStackTrace();
+//		}
+//		contentBuffer = super.getContent(fileUrl);
+//
+
+
+
 		//判断是否为视频播放URL
 		if (!super.checkUrl(fileUrl,"http://xiyou.cntv.cn/v-\\S+.html"))
 			return false;
 		
-		//将视频点击率、评论数记录插入videoInfUpdate表
-		count = getVideoClickRateOrComments(contentBuffer,"<div id=\"short_1\" class=\"shortinfo\">(.*?)</div>",
-				"<span class=\"vnum\">(.*?)</span>");
+		//将视频点击率、评论数记录插入videoInfUpdate表!  count存储的是播放数和评论数,第三项收藏数默认为-1
+		count = getVideoClickRateOrComments(contentBuffer,"<div class=\"play_num\">\\s*<i class=\"icon-play\"></i>(.*?)\\s*</div>",
+				fileUrl.toString());
 		String sqlVideoInfUpdate = "insert into videoInfUpdate(vUrl,vClickRate,vComments,vUpdateDate) values('" 
 			+ fileUrl.toString() + "'," + count[0] + "," + count[1]  + ",'" + super.getSystemTime() + "')";
 		
@@ -172,49 +185,81 @@ public class CntvSolver extends SiteSolver {
 	public String getVideoTag(StringBuffer contentString,String patternString)
 	{
 		String tag = "";
+		String commentsContent = "";
 		List<String> list = new ArrayList<String>();  
-		Pattern pattern = Pattern.compile(patternString,Pattern.CANON_EQ);
+		Pattern pattern = Pattern.compile(patternString);
 		Matcher matcher = pattern.matcher(contentString);
-		while(matcher.find())
-		{
-			String temp = matcher.group();
-			temp = temp.replaceAll("<.*?>", "");
-			list.add(temp);
+
+		if(matcher.find()){
+			commentsContent = matcher.group(1);
+			//用于统计标签
+			Pattern pattern1 = Pattern.compile("<a target=\"_blank\" onclick=\"javascript:keywordTransfer\\('video', '.*?'\\);\" title=\".*?\">(.*?)</a>");
+			Matcher matcher1 = pattern1.matcher(commentsContent);
+			while(matcher1.find())
+			{
+				String temp = matcher1.group(1);
+				list.add(temp.replaceAll("<.*?>",""));
+			}
+			if(list.size() == 0)
+				return tag;
+			else {
+				for(int i=0;i<list.size()-1;i++)
+					tag += list.get(i) + "#";
+				tag = tag + list.get(list.size()-1);
+			}
 		}
-		if(list.size() == 0)
-			return tag;
-		else {
-			for(int i=0;i<list.size()-1;i++)
-				tag += list.get(i).replaceAll("\\pP", "") + "#";
-			tag = tag + list.get(list.size()-1).replaceAll("\\pP", "");
-		}
-		return tag.replaceAll("[a-z]|[A-Z]|[0-9]|[：]|[～]|[~]", "");
-		
+		return tag;
 	}
 	
-	//获得视频点击率、评论数
-	public int[] getVideoClickRateOrComments(StringBuffer contentBuffer,String patternString,String regex2)
+
+	/**
+	 * 获得视频点击率、评论数   修改获取播放数和评论数,收藏数没有了
+	 * @param contentBuffer 传入获取的网页上下文
+	 * @param patternString 获取播放数的正则表达式
+	 * @param videoUrl 传入视频的URL地址
+     * @return
+     */
+	public int[] getVideoClickRateOrComments(StringBuffer contentBuffer,String patternString,String videoUrl)
 	{
 		int num[] = {0,0,0};
 		
         //页面源码
         Pattern pattern = Pattern.compile(patternString);
         Matcher matcher = pattern.matcher(contentBuffer);
-        if(!matcher.find())
-        {
-            return null;
+        if(matcher.find())
+		{
+			String clickRateStr = matcher.group(1);
+			String clickRateNum = clickRateStr.replaceAll(",","");
+			System.out.println(Integer.parseInt(clickRateNum));
+			num[0] = Integer.parseInt(clickRateNum); //获取播放数
+		}
+        Pattern pattern2 = Pattern.compile("http://xiyou.cntv.cn/v-(\\S+).html");
+        Matcher matcher2 = pattern2.matcher(videoUrl);
+		String vid = null;
+        if(matcher2.find())
+		{
+			vid = matcher2.group(1);
         }
-        //获取播放数、评论数、收藏数
-        int i=0;
-        String containStr = matcher.group(1);
-        Pattern pattern2 = Pattern.compile(regex2);
-        Matcher matcher2 = pattern2.matcher(containStr);
-        while(matcher2.find())
-        {
-        	num[i] = Integer.parseInt(matcher2.group(1).replace(",",""));
-        	i++;
-        	
-        }
+		if(null == vid){//如果没有获取到vid,返回评论数为0
+			num[1] = 0;
+		}else{
+			//获取到vid,获取json流,提取其中的total值
+			try {
+				StringBuffer json = super.getContent(
+						new URL("http://bbs.cntv.cn/api/?module=post&method=getchannelposts&" +
+								"varname=json&channel=xiyou&itemid=video_"
+								+vid+"&page=1&perpage=1000"));
+				Pattern pattern3 = Pattern.compile("\"total\":\"(\\d+?)\"");
+				Matcher matcher3 = pattern3.matcher(json);
+				if(matcher3.find()){
+					num[1]=Integer.parseInt(matcher3.group(1));
+				}
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+
+		}
+		num[2] = -1; //表示网站没有收藏数,网站已经取消了收藏数
 		return num;
 	}
 	
@@ -236,7 +281,7 @@ public class CntvSolver extends SiteSolver {
 	public String getCommentContent(String videoUrlString,String regex,String content,int minus)
 	{
 		int countFlag = 1;//评论计数
-		
+
 		String result = "";
 		try {
 			for(int i = 1;i<=10;i++)
@@ -244,36 +289,37 @@ public class CntvSolver extends SiteSolver {
 				int begin = videoUrlString.lastIndexOf("/")+3;
 				int end = videoUrlString.lastIndexOf(".");
 				String videoId = videoUrlString.substring(begin,end);
-				String vpcommentUrlStr = "http://comment.cntv.cn/comment/getjson/varname/json?channel=xiyou&itemid=video_" +
-							videoId + "&page=" + i;
+				String vpcommentUrlStr = "http://bbs.cntv.cn/api/?module=post&method=getchannelposts&" +
+						"varname=json&channel=xiyou&itemid=video_" +
+							videoId + "&page=" + i+"&perpage=10";
 				URL vpcommentUrl = new URL(vpcommentUrlStr);
 				StringBuffer vpcommentBuffer = getContent(vpcommentUrl);
 				if(vpcommentBuffer == null)
 					return content+result;
-				String ret = getContent(vpcommentBuffer, "ret\":\"(.*?)\"");
+				String ret = getContent(vpcommentBuffer, "\"content\":\\[(.*?)]");
 				//该页面没有评论内容
 				if(ret == null || ret.trim().equals("fail")  )
 					break;
-				
+
 				Pattern pp = Pattern.compile(regex);
 				Matcher mm = pp.matcher(vpcommentBuffer.toString().replaceAll("\\\\\"","\""));
-				while (mm.find()) 
+				while (mm.find())
 				{
 					countFlag++;
-					
+
 					String temp = mm.group(1).replaceAll("\\\\u","%u").replaceAll("\\\\/", "");
 					temp = unescape(temp).replaceAll("&nbsp;", "").replaceAll("<.*?>", "").replaceAll("[\\pP]|[a-z]|[A-Z]|[\\pN]|[\\pS]", " ");
-					temp = temp.replaceAll("\\s+", " ");	
+					temp = temp.replaceAll("\\s+", " ");
 					if(!temp.equals("") && !result.contains(temp) && !content.contains(temp) && temp.length() > 6)
 						result += temp + "#";
-					
+
 					if(minus != -1 && countFlag > minus)
 						break;
 				}
-				
+
 				if(minus != -1 && countFlag > minus)
 					break;
-				
+
 				if(result.length() > 16777214/2){
 					result = result.substring(0,16777214/2);
 					break;
@@ -301,9 +347,9 @@ public class CntvSolver extends SiteSolver {
 			vTitle = vTitle.substring(0, vTitle.length()-14);
 		vTitle = vTitle.replaceAll("[\\pP]|[a-z]|[A-Z]|[0-9]|[：]|[\\|]|[～]|[~]", "");
 		//上传日期
-		vDatatime = getVideoDate(contentString, "<span class=\"fsize11\">(.*?)</span>");
-		//标签
-		vTag = getVideoTag(contentString, "<b class=\"p5\">.*?</b>");
+		vDatatime = getVideoDate(contentString, "<span class=\"videoUploadTime\">(.*?)</span>");
+		//标签,
+		vTag = getVideoTag(contentString, "<p id=\"videoTags\"><span>标签:</span>\\s*([\\s\\S]*?)</p>");
 		if(vTag.equals("") || vTitle.equals(""))
 			return sqlText;
 		vCommentContent = getCommentContent(videoUrl, "content\":\"(.*?)\"","",-1);
@@ -315,5 +361,29 @@ public class CntvSolver extends SiteSolver {
 		
 		return sqlText;
 	}
-	
+
+	/**
+	 * 模块测试
+	 * @param args
+     */
+	public static void main(String[] args) {
+		try {
+			URL url = new URL("http://xiyou.cntv.cn/v-0adae89a-30d6-11df-be82-001e0bbb2454.html");
+			StringBuffer context =  SiteSolver.getContent(url);
+			CntvSolver cntvSolver = new CntvSolver(url,null,null);
+			String vTag = cntvSolver.getVideoTag(context,"<p id=\"videoTags\"><span>标签:</span>\\s*([\\s\\S]*?)</p>");
+			System.out.println(vTag);
+
+			String vCommentContent = cntvSolver.getCommentContent(url.toString(), "content\":\"(.*?)\"","",-1);
+			System.out.println(vCommentContent);
+
+			String vDatatime = cntvSolver.getVideoDate(context, "<span class=\"videoUploadTime\">(.*?)</span>");
+			System.out.println(vDatatime);
+
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+
+
+	}
 }

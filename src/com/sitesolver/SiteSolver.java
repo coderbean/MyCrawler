@@ -109,33 +109,34 @@ public class SiteSolver {
 	{
         return getMatchedUrls(getContent(url),prevString,patternString,postString);
 	}
-	
+
 	/**
 	静态方法：根据给定的URL得到网页内容
+	 这里修改是为了硕鼠403错误的修改,不要改咯
 	*/
 	public static StringBuffer getContent(URL url)
 	{
         StringBuffer contentBuffer = new StringBuffer();
-      
+
         int responseCode = -1;
         String sqlText = "";
         HttpURLConnection con = null;
 		try {
 			con = (HttpURLConnection)url.openConnection();
-			
+
 			//获得网页返回信息码
-			
+
 			responseCode = con.getResponseCode();
-			
+
 			if(responseCode == -1)
 				{
 					System.out.println(url.toString() +" : connection is failure...");
 					con.disconnect();
 					return null;
 				}
-			
+
 			System.out.println(url.toString() + " #get response code: " + responseCode);
-			
+
 			if (responseCode >= 400)	//请求失败
 				{
 					System.out.println("请求失败:get response code: "+ responseCode);
@@ -154,8 +155,8 @@ public class SiteSolver {
             InputStream inStr = con.getInputStream();
 			InputStreamReader istreamReader = new InputStreamReader(inStr);
 			BufferedReader buffStr = new BufferedReader(istreamReader);
-			
-			String str = null;	
+
+			String str = null;
 	        while((str = buffStr.readLine())!=null)
 	        	contentBuffer.append(str);
 	        inStr.close();
@@ -170,7 +171,7 @@ public class SiteSolver {
         	con.disconnect();
         }
         return contentBuffer;
-        
+
 	}
 	
 	public static StringBuffer getContent(URL url,String charset)

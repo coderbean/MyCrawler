@@ -127,7 +127,7 @@ public class SinaSolver extends SiteSolver {
 			//增量更新评论内容
 			String videoCommentStr = videoInfSet.get("vCommentContent").toString();
 			//获取之前的评论数
-			String sqlCommentCount = "SELECT vComments from videoinfupdate where vUrl='"+ fileUrl.toString() +"' ORDER BY vUpdateDate DESC";
+			String sqlCommentCount = "SELECT vComments from videoInfUpdate where vUrl='"+ fileUrl.toString() +"' ORDER BY vUpdateDate DESC";
 			list.clear();
 			list = dbmanager.executeQuery(sqlCommentCount);
 			videoInfSet.clear();
@@ -142,6 +142,14 @@ public class SinaSolver extends SiteSolver {
 			}
 			
 			System.out.println("该记录已经存在,更新点击率和评论数");
+			//修改了主键冲突无法更新的问题
+			Pattern pattern = Pattern.compile("(http:.*?)',");
+			Matcher matcher = pattern.matcher(sqlVideoInfUpdate);
+			String vUrl = null;
+			while(matcher.find()){
+				vUrl = matcher.group(1);
+			}
+			dbmanager.executeUpdate("DELETE FROM videoInfUpdate WHERE vUrl = '"+vUrl+"'");
 			dbmanager.executeUpdate(sqlVideoInfUpdate);
 			return true;
 		}

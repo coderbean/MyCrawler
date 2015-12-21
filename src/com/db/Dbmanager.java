@@ -89,6 +89,7 @@ public class Dbmanager {
 			count = st.executeUpdate(sqlString);
 		} catch (SQLException e) {
 			e.printStackTrace();
+			System.out.println(sqlString);
 			System.out.println("修改，插入或者删除数据库数据时发生错误!");
 		}finally{
 			closeConn(conn,st);

@@ -133,7 +133,7 @@ public class CntvSolver extends SiteSolver {
 			//增量更新评论内容
 			String videoCommentStr = videoInfSet.get("vCommentContent").toString();
 			//获取之前的评论数
-			String sqlCommentCount = "SELECT vComments from videoinfupdate where vUrl='"+ fileUrl.toString() +"' ORDER BY vUpdateDate DESC";
+			String sqlCommentCount = "SELECT vComments from videoInfUpdate where vUrl='"+ fileUrl.toString() +"' ORDER BY vUpdateDate DESC";
 			list.clear();
 			list = dbmanager.executeQuery(sqlCommentCount);
 			videoInfSet.clear();

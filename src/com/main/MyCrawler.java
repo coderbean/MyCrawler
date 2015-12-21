@@ -130,10 +130,10 @@ public class MyCrawler extends Thread {
 			m_init_Tag.initTagWithSeeds();
 			String sqlText = "select seedsUrl from seeds where seedsFlag = false";
 			myCrawler.initCrawlerWithSeeds(sqlText);
-			myCrawler.PushPageQueue(new URL("http://news.youku.com/"));
-			myCrawler.PushPageQueue(new URL("http://news.sina.com.cn/bn/shyfz/"));				//正常下载
-			myCrawler.PushPageQueue(new URL("http://v.163.com/zixun/V7M3CBCH5/1/rank_1.html")); //正常下载
-			myCrawler.PushPageQueue(new URL("http://news.ku6.com/"));							//正常下载
+//			myCrawler.PushPageQueue(new URL("http://news.youku.com/"));
+//			myCrawler.PushPageQueue(new URL("http://news.sina.com.cn/bn/shyfz/"));				//正常下载
+//			myCrawler.PushPageQueue(new URL("http://v.163.com/zixun/V7M3CBCH5/1/rank_1.html")); //正常下载
+//			myCrawler.PushPageQueue(new URL("http://news.ku6.com/"));							//正常下载
 			myCrawler.PushPageQueue(new URL("http://xiyou.cntv.cn/video/index-new-2.html"));    //正常下载
 			//debug
 			System.out.println("init size of m_page_que is " + myCrawler.m_page_que.size());
